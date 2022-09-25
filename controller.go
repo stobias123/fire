@@ -390,9 +390,9 @@ func (c *Controller) handle(prefix string, ctx *Context, selector bson.M, write 
 	}
 
 	// validate id if present
-	if ctx.JSONAPIRequest.ResourceID != "" && !coal.IsHex(ctx.JSONAPIRequest.ResourceID) {
-		xo.Abort(jsonapi.BadRequest("invalid resource id"))
-	}
+	//if ctx.JSONAPIRequest.ResourceID != "" && !coal.IsHex(ctx.JSONAPIRequest.ResourceID) {
+	//	xo.Abort(jsonapi.BadRequest("invalid resource id"))
+	//}
 
 	// set operation
 	switch ctx.JSONAPIRequest.Intent {
