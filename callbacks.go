@@ -52,7 +52,7 @@ func TimestampModifier(createdField, updatedField string) *Callback {
 			if ctx.Operation == Create {
 				stick.MustSet(ctx.Model, createdField, now)
 			} else if t := stick.MustGet(ctx.Model, createdField).(time.Time); t.IsZero() {
-				stick.MustSet(ctx.Model, createdField, ctx.Model.ID().Timestamp())
+				stick.MustSet(ctx.Model, createdField, time.Now())
 			}
 		}
 

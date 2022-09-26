@@ -421,7 +421,7 @@ func (b *Bucket) ClaimLink(ctx context.Context, link *Link, binding string, owne
 	}
 
 	// check file
-	if !link.File.IsZero() {
+	if link.File != "" {
 		return xo.F("existing claimed filed")
 	}
 
@@ -464,7 +464,7 @@ func (b *Bucket) ClaimFile(ctx context.Context, claimKey, binding string, owner 
 	}
 
 	// check owner
-	if owner.IsZero() {
+	if owner == "" {
 		return nil, xo.F("missing owner")
 	}
 
@@ -550,7 +550,7 @@ func (b *Bucket) Release(ctx context.Context, model coal.Model, field string) er
 func (b *Bucket) ReleaseLink(ctx context.Context, link *Link) error {
 	// get file
 	file := link.File
-	if file.IsZero() {
+	if file == "" {
 		return xo.F("invalid file id")
 	}
 
@@ -732,7 +732,7 @@ func (b *Bucket) modifyLink(ctx context.Context, newLink, oldLink *Link, binding
 	// claim new file
 	if added || updated {
 		// unset file
-		newLink.File = coal.ID{}
+		newLink.File = ""
 
 		// claim
 		err := b.ClaimLink(ctx, newLink, binding, owner)
@@ -794,7 +794,7 @@ func (b *Bucket) modifyLinks(ctx context.Context, newLinks, oldLinks Links, bind
 		link := newMap[ref]
 
 		// unset file
-		link.File = coal.ID{}
+		link.File = ""
 
 		// claim
 		err := b.ClaimLink(ctx, link, binding, owner)
@@ -835,7 +835,7 @@ func (b *Bucket) GetViewKey(ctx context.Context, file coal.ID) (string, error) {
 // Decorate will populate the provided link if a file is available.
 func (b *Bucket) Decorate(ctx context.Context, link *Link) error {
 	// skip if file is missing
-	if link == nil || link.File.IsZero() {
+	if link == nil || link.File == "" {
 		return nil
 	}
 
@@ -1018,7 +1018,7 @@ func (b *Bucket) DownloadAction() *fire.Action {
 			if binding.FileName != "" {
 				filename = binding.FileName
 			} else if filename == "" {
-				filename = file.ID().Hex()
+				filename = file.ID()
 			}
 
 			// set disposition
@@ -1034,7 +1034,7 @@ func (b *Bucket) DownloadAction() *fire.Action {
 		ctx.ResponseWriter.Header().Del("Content-Security-Policy")
 
 		// cache download for one year, using a versioned ETag based on the file ID
-		ctx.ResponseWriter.Header().Set("ETag", `"v1-`+file.ID().Hex()+`"`)
+		ctx.ResponseWriter.Header().Set("ETag", `"v1-`+file.ID()+`"`)
 		ctx.ResponseWriter.Header().Set("Cache-Control", "public, max-age=31536000")
 
 		// stream download
@@ -1051,7 +1051,7 @@ func (b *Bucket) DownloadAction() *fire.Action {
 func (b *Bucket) CleanupFile(ctx context.Context, id coal.ID) error {
 	// trace
 	ctx, span := xo.Trace(ctx, "blaze/Bucket.CleanupFile")
-	span.Tag("id", id.Hex())
+	span.Tag("id", id)
 	defer span.End()
 
 	// get file
@@ -1176,7 +1176,7 @@ func (b *Bucket) CleanupTask(retention time.Duration, batch int) *axe.Task {
 			// enqueue jobs
 			for _, file := range files {
 				_, err = ctx.Queue.Enqueue(ctx, &CleanupJob{
-					Base: axe.B(file.ID().Hex()),
+					Base: axe.B(file.ID()),
 				}, 0, 0)
 				if err != nil {
 					return err
@@ -1205,7 +1205,7 @@ func (b *Bucket) CleanupTask(retention time.Duration, batch int) *axe.Task {
 func (b *Bucket) MigrateFile(ctx context.Context, id coal.ID) error {
 	// trace
 	ctx, span := xo.Trace(ctx, "blaze/Bucket.MigrateFile")
-	span.Tag("id", id.Hex())
+	span.Tag("id", id)
 	defer span.End()
 
 	// download original file
@@ -1333,7 +1333,7 @@ func (b *Bucket) MigrateTask(services []string, batch int) *axe.Task {
 			// enqueue jobs
 			for _, file := range files {
 				_, err = ctx.Queue.Enqueue(ctx, &MigrateJob{
-					Base: axe.B(file.ID().Hex()),
+					Base: axe.B(file.ID()),
 				}, 0, 0)
 				if err != nil {
 					return err

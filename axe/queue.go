@@ -285,5 +285,5 @@ func (q *Queue) get(name string) (coal.ID, bool) {
 		}
 	}
 
-	return coal.ID{}, false
+	return "", false
 }

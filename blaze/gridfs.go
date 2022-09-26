@@ -38,7 +38,7 @@ func (g *GridFS) Prepare(context.Context) (Handle, error) {
 func (g *GridFS) Upload(ctx context.Context, handle Handle, _ Info) (Upload, error) {
 	// get id
 	id, ok := handle["id"].(coal.ID)
-	if !ok || id.IsZero() {
+	if !ok || id == "" {
 		return nil, ErrInvalidHandle.Wrap()
 	}
 
@@ -57,7 +57,7 @@ func (g *GridFS) Upload(ctx context.Context, handle Handle, _ Info) (Upload, err
 func (g *GridFS) Lookup(ctx context.Context, handle Handle) (Info, error) {
 	// get id
 	id, ok := handle["id"].(coal.ID)
-	if !ok || id.IsZero() {
+	if !ok || id == "" {
 		return Info{}, ErrInvalidHandle.Wrap()
 	}
 
@@ -88,7 +88,7 @@ func (g *GridFS) Lookup(ctx context.Context, handle Handle) (Info, error) {
 func (g *GridFS) Download(ctx context.Context, handle Handle) (Download, error) {
 	// get id
 	id, ok := handle["id"].(coal.ID)
-	if !ok || id.IsZero() {
+	if !ok || id == "" {
 		return nil, ErrInvalidHandle.Wrap()
 	}
 
@@ -115,7 +115,7 @@ func (g *GridFS) Download(ctx context.Context, handle Handle) (Download, error) 
 func (g *GridFS) Delete(ctx context.Context, handle Handle) error {
 	// get id
 	id, ok := handle["id"].(coal.ID)
-	if !ok || id.IsZero() {
+	if !ok || id == "" {
 		return ErrInvalidHandle.Wrap()
 	}
 

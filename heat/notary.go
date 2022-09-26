@@ -48,7 +48,7 @@ func (n *Notary) Issue(ctx context.Context, key Key) (string, error) {
 	base := key.GetBase()
 
 	// ensure id
-	if base.ID.IsZero() {
+	if base.ID == "" {
 		base.ID = coal.New()
 	}
 
@@ -77,7 +77,7 @@ func (n *Notary) Issue(ctx context.Context, key Key) (string, error) {
 
 	// issue token
 	token, err := Issue(n.secret, n.issuer, meta.Name, RawKey{
-		ID:      base.ID.Hex(),
+		ID:      base.ID,
 		Issued:  base.Issued,
 		Expires: base.Expires,
 		Data:    data,

@@ -32,7 +32,7 @@ func TestConvertModel(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, &jsonapi.Resource{
 		Type: "foos",
-		ID:   id.Hex(),
+		ID:   id,
 		Attributes: jsonapi.Map{
 			"string": "String",
 			"bool":   false,
@@ -42,7 +42,7 @@ func TestConvertModel(t *testing.T) {
 				Data: &jsonapi.HybridResource{
 					One: &jsonapi.Resource{
 						Type: "foos",
-						ID:   id.Hex(),
+						ID:   id,
 					},
 				},
 			},
@@ -66,7 +66,7 @@ func TestConvertModel(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, &jsonapi.Resource{
 		Type: "foos",
-		ID:   id.Hex(),
+		ID:   id,
 		Attributes: jsonapi.Map{
 			"string": "String",
 			"bool":   false,
@@ -76,7 +76,7 @@ func TestConvertModel(t *testing.T) {
 				Data: &jsonapi.HybridResource{
 					One: &jsonapi.Resource{
 						Type: "foos",
-						ID:   id.Hex(),
+						ID:   id,
 					},
 				},
 			},
@@ -101,7 +101,7 @@ func TestConvertModel(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, &jsonapi.Resource{
 		Type: "foos",
-		ID:   id.Hex(),
+		ID:   id,
 		Attributes: jsonapi.Map{
 			"string": "String",
 			"bool":   false,
@@ -111,7 +111,7 @@ func TestConvertModel(t *testing.T) {
 				Data: &jsonapi.HybridResource{
 					One: &jsonapi.Resource{
 						Type: "foos",
-						ID:   id.Hex(),
+						ID:   id,
 					},
 				},
 			},
@@ -119,7 +119,7 @@ func TestConvertModel(t *testing.T) {
 				Data: &jsonapi.HybridResource{
 					One: &jsonapi.Resource{
 						Type: "foos",
-						ID:   id.Hex(),
+						ID:   id,
 					},
 				},
 			},
@@ -128,7 +128,7 @@ func TestConvertModel(t *testing.T) {
 					Many: []*jsonapi.Resource{
 						{
 							Type: "foos",
-							ID:   id.Hex(),
+							ID:   id,
 						},
 					},
 				},
@@ -162,7 +162,7 @@ func TestAssignResource(t *testing.T) {
 			"one": {
 				Data: &jsonapi.HybridResource{
 					One: &jsonapi.Resource{
-						ID: id.Hex(),
+						ID: id,
 					},
 				},
 			},
@@ -190,7 +190,7 @@ func TestAssignResource(t *testing.T) {
 			"opt-one": {
 				Data: &jsonapi.HybridResource{
 					One: &jsonapi.Resource{
-						ID: id.Hex(),
+						ID: id,
 					},
 				},
 			},
@@ -223,7 +223,7 @@ func TestAssignResource(t *testing.T) {
 				Data: &jsonapi.HybridResource{
 					Many: []*jsonapi.Resource{
 						{
-							ID: id.Hex(),
+							ID: id,
 						},
 					},
 				},

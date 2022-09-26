@@ -43,7 +43,7 @@ func (c *Client) List(model coal.Model, reqs ...jsonapi.Request) ([]coal.Model, 
 // Find will find and return the provided model.
 func (c *Client) Find(model coal.Model, reqs ...jsonapi.Request) (coal.Model, *jsonapi.Document, error) {
 	// find resource
-	doc, err := c.client.Find(getType(model), model.ID().Hex(), reqs...)
+	doc, err := c.client.Find(getType(model), model.ID(), reqs...)
 	if err != nil {
 		return nil, doc, err
 	}
@@ -112,7 +112,7 @@ func (c *Client) Update(model coal.Model) (coal.Model, *jsonapi.Document, error)
 // Delete will delete the provided model.
 func (c *Client) Delete(model coal.Model) error {
 	// delete resource
-	err := c.client.Delete(getType(model), model.ID().Hex())
+	err := c.client.Delete(getType(model), model.ID())
 	if err != nil {
 		return err
 	}

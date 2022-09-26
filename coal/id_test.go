@@ -9,12 +9,12 @@ import (
 func TestIsHex(t *testing.T) {
 	assert.False(t, IsHex("foo"))
 	assert.False(t, IsHex(""))
-	assert.True(t, IsHex(New().Hex()))
+	assert.True(t, IsHex(New()))
 }
 
 func TestMustFromHex(t *testing.T) {
 	assert.NotPanics(t, func() {
-		MustFromHex(New().Hex())
+		MustFromHex(New())
 	})
 
 	assert.Panics(t, func() {

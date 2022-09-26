@@ -47,7 +47,7 @@ type Link struct {
 func (l *Link) Validate(requireFilename bool, whitelist ...string) error {
 	// ensure reference
 	if l.Ref == "" {
-		l.Ref = coal.New().Hex()
+		l.Ref = coal.New()
 	}
 
 	return stick.Validate(l, func(v *stick.Validator) {

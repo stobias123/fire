@@ -64,7 +64,7 @@ func TestWatcher(t *testing.T) {
 		assert.Equal(t, websocket.TextMessage, typ)
 		assert.JSONEq(t, `{
 			"items": {
-				"`+itm.ID().Hex()+`": "created"
+				"`+itm.ID()+`": "created"
 			}
 		}`, string(bytes))
 
@@ -79,7 +79,7 @@ func TestWatcher(t *testing.T) {
 		assert.Equal(t, websocket.TextMessage, typ)
 		assert.JSONEq(t, `{
 			"items": {
-				"`+itm.ID().Hex()+`": "updated"
+				"`+itm.ID()+`": "updated"
 			}
 		}`, string(bytes))
 
@@ -93,7 +93,7 @@ func TestWatcher(t *testing.T) {
 		assert.Equal(t, websocket.TextMessage, typ)
 		assert.JSONEq(t, `{
 			"items": {
-				"`+itm.ID().Hex()+`": "deleted"
+				"`+itm.ID()+`": "deleted"
 			}
 		}`, string(bytes))
 

@@ -789,17 +789,17 @@ func (a *Authenticator) introspectionEndpoint(ctx *Context) {
 		if !expired && (data.Type == AccessToken || data.Type == RefreshToken) {
 			res.Active = true
 			res.Scope = data.Scope
-			res.ClientID = data.ClientID.Hex()
+			res.ClientID = data.ClientID
 			if data.ResourceOwnerID != nil {
-				res.Username = data.ResourceOwnerID.Hex()
+				res.Username = *data.ResourceOwnerID
 			}
 			res.TokenType = oauth2.AccessToken
 			if data.Type == RefreshToken {
 				res.TokenType = oauth2.RefreshToken
 			}
 			res.ExpiresAt = data.ExpiresAt.Unix()
-			res.IssuedAt = token.ID().Timestamp().Unix()
-			res.Identifier = token.ID().Hex()
+			res.IssuedAt = time.Now().Unix()
+			res.Identifier = token.ID()
 			res.Extra = a.policy.TokenData(client, resourceOwner, token)
 		}
 	}

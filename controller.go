@@ -1,7 +1,6 @@
 package fire
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"fmt"
@@ -38,6 +37,8 @@ const (
 	Validator
 	Decorator
 	Notifier
+	// this should likely be the first one, but that feels like a bigger refactor right now.
+	Mutator
 )
 
 var allStages = []Stage{
@@ -47,6 +48,7 @@ var allStages = []Stage{
 	Validator,
 	Decorator,
 	Notifier,
+	Mutator,
 }
 
 // Split will split a compound stage into a list of separate stages.
@@ -133,6 +135,14 @@ type Controller struct {
 	//
 	// Operations: !CollectionAction
 	Verifiers []*Callback
+
+	// Mutators are run to modify the model BEFORE it is loaded.
+	//
+	// The callbacks are expected to modify the JSONAPIRequest in order
+	// to change the model that is loaded
+	//
+	// Operations: !Create, Update, Delete
+	Mutators []*Callback
 
 	// Modifiers are run to modify the model during Create, Update and Delete
 	// operations after the model is loaded and the changed attributes have been
@@ -532,6 +542,9 @@ func (c *Controller) findResource(ctx *Context) {
 	// replace context
 	ctx.Context = ct
 
+	// run Mutators
+	c.runCallbacks(ctx, Mutator, c.Mutators, http.StatusInternalServerError)
+
 	// load model
 	c.loadModel(ctx)
 
@@ -544,7 +557,7 @@ func (c *Controller) findResource(ctx *Context) {
 	// compose response
 	ctx.Response = &jsonapi.Document{
 		Data: &jsonapi.HybridResource{
-			One: c.resourceForModel(ctx, ctx.Model, relationships),
+			One: c.ResourceForModel(ctx, ctx.Model, relationships),
 		},
 		Links: &jsonapi.DocumentLinks{
 			Self: jsonapi.Link(ctx.JSONAPIRequest.Self()),
@@ -613,7 +626,7 @@ func (c *Controller) createResource(ctx *Context) {
 	// set initial update token if consistent update is enabled
 	if c.ConsistentUpdate {
 		consistentUpdateField := coal.L(ctx.Model, "fire-consistent-update", true)
-		stick.MustSet(ctx.Model, consistentUpdateField, coal.New().Hex())
+		stick.MustSet(ctx.Model, consistentUpdateField, coal.New())
 	}
 
 	// check if idempotent create is enabled
@@ -654,13 +667,13 @@ func (c *Controller) createResource(ctx *Context) {
 
 	// prepare link
 	selfLink := ctx.JSONAPIRequest.Merge(jsonapi.Request{
-		ResourceID: ctx.Model.ID().Hex(),
+		ResourceID: ctx.Model.ID(),
 	})
 
 	// compose response
 	ctx.Response = &jsonapi.Document{
 		Data: &jsonapi.HybridResource{
-			One: c.resourceForModel(ctx, ctx.Model, nil),
+			One: c.ResourceForModel(ctx, ctx.Model, nil),
 		},
 		Links: &jsonapi.DocumentLinks{
 			Self: jsonapi.Link(selfLink.Self()),
@@ -755,7 +768,7 @@ func (c *Controller) updateResource(ctx *Context) {
 		}
 
 		// generate new update token
-		stick.MustSet(ctx.Model, consistentUpdateField, coal.New().Hex())
+		stick.MustSet(ctx.Model, consistentUpdateField, coal.New())
 
 		// update model
 		found, err := ctx.Store.M(c.Model).ReplaceFirst(ctx, bson.M{
@@ -794,7 +807,7 @@ func (c *Controller) updateResource(ctx *Context) {
 	// compose response
 	ctx.Response = &jsonapi.Document{
 		Data: &jsonapi.HybridResource{
-			One: c.resourceForModel(ctx, ctx.Model, relationships),
+			One: c.ResourceForModel(ctx, ctx.Model, relationships),
 		},
 		Links: &jsonapi.DocumentLinks{
 			Self: jsonapi.Link(ctx.JSONAPIRequest.Self()),
@@ -1070,7 +1083,7 @@ func (c *Controller) getRelationship(ctx *Context) {
 	relationships := c.preloadRelationships(ctx, []coal.Model{ctx.Model})
 
 	// get resource
-	resource := c.resourceForModel(ctx, ctx.Model, relationships)
+	resource := c.ResourceForModel(ctx, ctx.Model, relationships)
 
 	// get relationship
 	ctx.Response = resource.Relationships[ctx.JSONAPIRequest.Relationship]
@@ -1147,7 +1160,7 @@ func (c *Controller) setRelationship(ctx *Context) {
 	relationships := c.preloadRelationships(ctx, []coal.Model{ctx.Model})
 
 	// get resource
-	resource := c.resourceForModel(ctx, ctx.Model, relationships)
+	resource := c.ResourceForModel(ctx, ctx.Model, relationships)
 
 	// get relationship
 	ctx.Response = resource.Relationships[ctx.JSONAPIRequest.Relationship]
@@ -1247,7 +1260,7 @@ func (c *Controller) appendToRelationship(ctx *Context) {
 	relationships := c.preloadRelationships(ctx, []coal.Model{ctx.Model})
 
 	// get resource
-	resource := c.resourceForModel(ctx, ctx.Model, relationships)
+	resource := c.ResourceForModel(ctx, ctx.Model, relationships)
 
 	// get relationship
 	ctx.Response = resource.Relationships[ctx.JSONAPIRequest.Relationship]
@@ -1354,7 +1367,7 @@ func (c *Controller) removeFromRelationship(ctx *Context) {
 	relationships := c.preloadRelationships(ctx, []coal.Model{ctx.Model})
 
 	// get resource
-	resource := c.resourceForModel(ctx, ctx.Model, relationships)
+	resource := c.ResourceForModel(ctx, ctx.Model, relationships)
 
 	// get relationship
 	ctx.Response = resource.Relationships[ctx.JSONAPIRequest.Relationship]
@@ -1413,6 +1426,7 @@ func (c *Controller) handleResourceAction(ctx *Context) {
 	// replace context
 	ctx.Context = ct
 
+	c.runCallbacks(ctx, Mutator, c.Mutators, http.StatusInternalServerError)
 	// load model
 	c.loadModel(ctx)
 
@@ -2016,7 +2030,7 @@ func (c *Controller) assignRelationship(ctx *Context, rel *jsonapi.Document, fie
 		if !field.Optional {
 			stick.MustSet(ctx.Model, field.Name, id)
 		} else {
-			if !id.IsZero() {
+			if id != "" {
 				stick.MustSet(ctx.Model, field.Name, &id)
 			} else {
 				stick.MustSet(ctx.Model, field.Name, stick.N[coal.ID]())
@@ -2154,7 +2168,7 @@ func (c *Controller) preloadRelationships(ctx *Context, models []coal.Model) map
 				if rel.ToOne {
 					// get reference id
 					rid, _ := value.(coal.ID)
-					if !rid.IsZero() && rid == modelID {
+					if rid != "" && rid == modelID {
 						// add reference
 						entry[modelID] = append(entry[modelID], id)
 					}
@@ -2167,7 +2181,7 @@ func (c *Controller) preloadRelationships(ctx *Context, models []coal.Model) map
 					for _, _rid := range rids {
 						// get reference id
 						rid, _ := _rid.(coal.ID)
-						if !rid.IsZero() && rid == modelID {
+						if rid != "" && rid == modelID {
 							// add reference
 							entry[modelID] = append(entry[modelID], id)
 						}
@@ -2177,11 +2191,12 @@ func (c *Controller) preloadRelationships(ctx *Context, models []coal.Model) map
 		}
 
 		// sort references
-		for _, refs := range entry {
-			sort.Slice(refs, func(i, j int) bool {
-				return bytes.Compare(refs[i][:], refs[j][:]) < 0
-			})
-		}
+		// TODO: reimplement this.
+		//for _, refs := range entry {
+		//sort.Slice(refs, func(i, j int) bool {
+		//	return bytes.Compare(refs[i][:], refs[j][:]) < 0
+		//})
+		//}
 
 		// set references
 		relationships[field.RelName] = entry
@@ -2190,9 +2205,9 @@ func (c *Controller) preloadRelationships(ctx *Context, models []coal.Model) map
 	return relationships
 }
 
-func (c *Controller) resourceForModel(ctx *Context, model coal.Model, relationships map[string]map[coal.ID][]coal.ID) *jsonapi.Resource {
+func (c *Controller) ResourceForModel(ctx *Context, model coal.Model, relationships map[string]map[coal.ID][]coal.ID) *jsonapi.Resource {
 	// trace
-	ctx.Tracer.Push("fire/Controller.resourceForModel")
+	ctx.Tracer.Push("fire/Controller.ResourceForModel")
 	defer ctx.Tracer.Pop()
 
 	// construct resource
@@ -2250,7 +2265,7 @@ func (c *Controller) constructResource(ctx *Context, model coal.Model, relations
 	// prepare resource
 	resource := &jsonapi.Resource{
 		Type:          c.meta.PluralName,
-		ID:            model.ID().Hex(),
+		ID:            model.ID(),
 		Attributes:    m,
 		Relationships: make(map[string]*jsonapi.Document),
 	}
@@ -2259,7 +2274,7 @@ func (c *Controller) constructResource(ctx *Context, model coal.Model, relations
 	baseLink := jsonapi.Request{
 		Prefix:       ctx.JSONAPIRequest.Prefix,
 		ResourceType: c.meta.PluralName,
-		ResourceID:   model.ID().Hex(),
+		ResourceID:   model.ID(),
 	}
 
 	// go through all relationships
@@ -2296,14 +2311,14 @@ func (c *Controller) constructResource(ctx *Context, model coal.Model, relations
 				if oid != nil {
 					reference = &jsonapi.Resource{
 						Type: field.RelType,
-						ID:   oid.Hex(),
+						ID:   *oid,
 					}
 				}
 			} else {
 				// directly create reference
 				reference = &jsonapi.Resource{
 					Type: field.RelType,
-					ID:   stick.MustGet(model, field.Name).(coal.ID).Hex(),
+					ID:   stick.MustGet(model, field.Name).(coal.ID),
 				}
 			}
 
@@ -2325,7 +2340,7 @@ func (c *Controller) constructResource(ctx *Context, model coal.Model, relations
 			for i, id := range ids {
 				references[i] = &jsonapi.Resource{
 					Type: field.RelType,
-					ID:   id.Hex(),
+					ID:   id,
 				}
 			}
 
@@ -2365,7 +2380,7 @@ func (c *Controller) constructResource(ctx *Context, model coal.Model, relations
 			if len(refs) == 1 {
 				reference = &jsonapi.Resource{
 					Type: field.RelType,
-					ID:   refs[0].Hex(),
+					ID:   refs[0],
 				}
 			}
 
@@ -2400,7 +2415,7 @@ func (c *Controller) constructResource(ctx *Context, model coal.Model, relations
 			for i, id := range refs {
 				references[i] = &jsonapi.Resource{
 					Type: field.RelType,
-					ID:   id.Hex(),
+					ID:   id,
 				}
 			}
 

@@ -18,7 +18,8 @@ const benchListItems = 20
 
 // TODO: Increase concurrency.
 
-var benchStore = coal.MustConnect("mongodb://0.0.0.0/test-fire-coal?maxPoolSize=100", xo.Panic)
+//var benchStore = coal.MustConnect("mongodb://0.0.0.0/test-fire-coal?maxPoolSize=100", xo.Panic)
+var benchStore = coal.MustConnect("mongodb+srv://skidrow:ZpJfzt1zEGLBQQdH@skidrow.rc4a3ei.mongodb.net/bench?retryWrites=true&w=majority", xo.Panic)
 
 var benchThrottle = 100
 
@@ -149,7 +150,7 @@ func findBenchmark(b *testing.B, store *coal.Store, parallelism int) {
 	}).ID()
 
 	parallelBenchmark(b, parallelism, func() bool {
-		res := serve.Record(tester.Handler, "GET", "/posts/"+id.Hex(), nil, "")
+		res := serve.Record(tester.Handler, "GET", "/posts/"+id, nil, "")
 		return res.Code == http.StatusOK
 	})
 }

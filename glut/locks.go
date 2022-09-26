@@ -39,7 +39,7 @@ func Lock(ctx context.Context, store *coal.Store, value Value, timeout time.Dura
 	}
 
 	// ensure token
-	if base.Token.IsZero() {
+	if base.Token == "" {
 		base.Token = coal.New()
 	}
 
@@ -48,7 +48,7 @@ func Lock(ctx context.Context, store *coal.Store, value Value, timeout time.Dura
 	if deadline != nil {
 		span.Tag("deadline", deadline.String())
 	}
-	span.Tag("token", base.Token.Hex())
+	span.Tag("token", base.Token)
 
 	// check timeout
 	if timeout == 0 {
@@ -164,10 +164,10 @@ func SetLocked(ctx context.Context, store *coal.Store, value Value) (bool, error
 	if deadline != nil {
 		span.Tag("deadline", deadline.String())
 	}
-	span.Tag("token", base.Token.Hex())
+	span.Tag("token", base.Token)
 
 	// check token
-	if base.Token.IsZero() {
+	if base.Token == "" {
 		return false, xo.F("missing token")
 	}
 
@@ -222,10 +222,10 @@ func GetLocked(ctx context.Context, store *coal.Store, value Value) (bool, error
 
 	// log key and token
 	span.Tag("key", key)
-	span.Tag("token", base.Token.Hex())
+	span.Tag("token", base.Token)
 
 	// check token
-	if base.Token.IsZero() {
+	if base.Token == "" {
 		return false, xo.F("missing token")
 	}
 
@@ -276,10 +276,10 @@ func DeleteLocked(ctx context.Context, store *coal.Store, value Value) (bool, er
 
 	// log key and token
 	span.Tag("key", key)
-	span.Tag("token", base.Token.Hex())
+	span.Tag("token", base.Token)
 
 	// check token
-	if base.Token.IsZero() {
+	if base.Token == "" {
 		return false, xo.F("missing token")
 	}
 
@@ -353,10 +353,10 @@ func Unlock(ctx context.Context, store *coal.Store, value Value) (bool, error) {
 	if deadline != nil {
 		span.Tag("deadline", deadline.String())
 	}
-	span.Tag("token", base.Token.Hex())
+	span.Tag("token", base.Token)
 
 	// check token
-	if base.Token.IsZero() {
+	if base.Token == "" {
 		return false, xo.F("missing token")
 	}
 

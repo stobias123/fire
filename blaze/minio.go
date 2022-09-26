@@ -28,7 +28,7 @@ func NewMinio(client *minio.Client, bucket string) *Minio {
 // Prepare implements the Service interface.
 func (m *Minio) Prepare(context.Context) (Handle, error) {
 	// construct name
-	str := coal.New().Hex()
+	str := coal.New()
 	name := fmt.Sprintf("%s/%s/%s", str[len(str)-2:], str[len(str)-4:len(str)-2], str)
 
 	// create handle

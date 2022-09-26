@@ -78,7 +78,7 @@ func TestBasicOperations(t *testing.T) {
 		tester.Request("POST", "posts", `{
 			"data": {
 				"type": "posts",
-				"id": "`+coal.New().Hex()+`"
+				"id": "`+coal.New()+`"
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusBadRequest, r.Result().StatusCode, tester.DebugRequest(rq, r))
@@ -123,7 +123,7 @@ func TestBasicOperations(t *testing.T) {
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
 			post := tester.FindLast(&postModel{})
-			id = post.ID().Hex()
+			id = post.ID()
 
 			assert.Equal(t, http.StatusCreated, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -212,7 +212,7 @@ func TestBasicOperations(t *testing.T) {
 		// attempt to update post with missing document
 		tester.Request("PATCH", "posts/"+id, `{}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
 			post := tester.FindLast(&postModel{})
-			id = post.ID().Hex()
+			id = post.ID()
 
 			assert.Equal(t, http.StatusBadRequest, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -232,7 +232,7 @@ func TestBasicOperations(t *testing.T) {
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
 			post := tester.FindLast(&postModel{})
-			id = post.ID().Hex()
+			id = post.ID()
 
 			assert.Equal(t, http.StatusBadRequest, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -248,11 +248,11 @@ func TestBasicOperations(t *testing.T) {
 		tester.Request("PATCH", "posts/"+id, `{
 			"data": {
 				"type": "posts",
-				"id": "`+coal.New().Hex()+`"
+				"id": "`+coal.New()+`"
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
 			post := tester.FindLast(&postModel{})
-			id = post.ID().Hex()
+			id = post.ID()
 
 			assert.Equal(t, http.StatusBadRequest, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -272,7 +272,7 @@ func TestBasicOperations(t *testing.T) {
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
 			post := tester.FindLast(&postModel{})
-			id = post.ID().Hex()
+			id = post.ID()
 
 			assert.Equal(t, http.StatusBadRequest, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -295,7 +295,7 @@ func TestBasicOperations(t *testing.T) {
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
 			post := tester.FindLast(&postModel{})
-			id = post.ID().Hex()
+			id = post.ID()
 
 			assert.Equal(t, http.StatusBadRequest, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -373,7 +373,7 @@ func TestBasicOperations(t *testing.T) {
 		})
 
 		// attempt to get not existing post
-		tester.Request("GET", "posts/"+coal.New().Hex(), "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("GET", "posts/"+coal.New(), "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusNotFound, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
 				"errors": [{
@@ -472,7 +472,7 @@ func TestHasOneRelationships(t *testing.T) {
 		// create new post
 		post := tester.Insert(&postModel{
 			Title: "Post 2",
-		}).ID().Hex()
+		}).ID()
 
 		// get single post
 		tester.Request("GET", "posts/"+post, "", func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -627,7 +627,7 @@ func TestHasOneRelationships(t *testing.T) {
 				}
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
-			note = tester.FindLast(&noteModel{}).ID().Hex()
+			note = tester.FindLast(&noteModel{}).ID()
 
 			assert.Equal(t, http.StatusCreated, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -726,7 +726,7 @@ func TestHasManyRelationships(t *testing.T) {
 		// create new post
 		post := tester.Insert(&postModel{
 			Title: "Post 2",
-		}).ID().Hex()
+		}).ID()
 
 		// get single post
 		tester.Request("GET", "posts/"+post, "", func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -827,7 +827,7 @@ func TestHasManyRelationships(t *testing.T) {
 				}
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
-			comment = tester.FindLast(&commentModel{}).ID().Hex()
+			comment = tester.FindLast(&commentModel{}).ID()
 
 			assert.Equal(t, http.StatusCreated, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -935,16 +935,16 @@ func TestToOneRelationships(t *testing.T) {
 		// create posts
 		post1 := tester.Insert(&postModel{
 			Title: "Post 1",
-		}).ID().Hex()
+		}).ID()
 		post2 := tester.Insert(&postModel{
 			Title: "Post 2",
-		}).ID().Hex()
+		}).ID()
 
 		// create comment
 		comment1 := tester.Insert(&commentModel{
 			Message: "Comment 1",
 			Post:    coal.MustFromHex(post1),
-		}).ID().Hex()
+		}).ID()
 
 		var comment2 string
 
@@ -971,7 +971,7 @@ func TestToOneRelationships(t *testing.T) {
 				}
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
-			comment2 = tester.FindLast(&commentModel{}).ID().Hex()
+			comment2 = tester.FindLast(&commentModel{}).ID()
 
 			assert.Equal(t, http.StatusCreated, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -1267,13 +1267,13 @@ func TestToManyRelationships(t *testing.T) {
 		// create posts
 		post1 := tester.Insert(&postModel{
 			Title: "Post 1",
-		}).ID().Hex()
+		}).ID()
 		post2 := tester.Insert(&postModel{
 			Title: "Post 2",
-		}).ID().Hex()
+		}).ID()
 		post3 := tester.Insert(&postModel{
 			Title: "Post 3",
-		}).ID().Hex()
+		}).ID()
 
 		var selection string
 
@@ -1300,7 +1300,7 @@ func TestToManyRelationships(t *testing.T) {
 				}
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
-			selection = tester.FindLast(&selectionModel{}).ID().Hex()
+			selection = tester.FindLast(&selectionModel{}).ID()
 
 			assert.Equal(t, http.StatusCreated, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -1809,7 +1809,7 @@ func TestModelValidation(t *testing.T) {
 		})
 
 		// find
-		tester.Request("GET", "/posts/"+post.Hex(), "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("GET", "/posts/"+post, "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusOK, r.Result().StatusCode, tester.DebugRequest(rq, r))
 		})
 
@@ -1833,10 +1833,10 @@ func TestModelValidation(t *testing.T) {
 		})
 
 		// update
-		tester.Request("PATCH", "/posts/"+post.Hex(), `{
+		tester.Request("PATCH", "/posts/"+post, `{
 			"data": {
 				"type": "posts",
-				"id": "`+post.Hex()+`",
+				"id": "`+post+`",
 				"attributes": {
 					"title": "error"
 				}
@@ -1853,7 +1853,7 @@ func TestModelValidation(t *testing.T) {
 		})
 
 		// delete
-		tester.Request("DELETE", "/posts/"+post.Hex(), "{}", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("DELETE", "/posts/"+post, "{}", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusNoContent, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.Equal(t, "", r.Body.String(), tester.DebugRequest(rq, r))
 		})
@@ -1906,15 +1906,15 @@ func TestFiltering(t *testing.T) {
 		post1 := tester.Insert(&postModel{
 			Title:     "post-1",
 			Published: true,
-		}).ID().Hex()
+		}).ID()
 		post2 := tester.Insert(&postModel{
 			Title:     "post-2",
 			Published: false,
-		}).ID().Hex()
+		}).ID()
 		post3 := tester.Insert(&postModel{
 			Title:     "post-3",
 			Published: true,
-		}).ID().Hex()
+		}).ID()
 
 		// create selections
 		selection := tester.Insert(&selectionModel{
@@ -1924,7 +1924,7 @@ func TestFiltering(t *testing.T) {
 				coal.MustFromHex(post2),
 				coal.MustFromHex(post3),
 			},
-		}).ID().Hex()
+		}).ID()
 		tester.Insert(&selectionModel{
 			Name: "selection-2",
 		})
@@ -1933,7 +1933,7 @@ func TestFiltering(t *testing.T) {
 		note := tester.Insert(&noteModel{
 			Title: "note-1",
 			Post:  coal.MustFromHex(post1),
-		}).ID().Hex()
+		}).ID()
 		tester.Insert(&noteModel{
 			Title: "note-2",
 			Post:  coal.New(),
@@ -2474,10 +2474,10 @@ func TestFilterHandlers(t *testing.T) {
 		// create posts
 		post1 := tester.Insert(&postModel{
 			Title: "foo",
-		}).ID().Hex()
+		}).ID()
 		post2 := tester.Insert(&postModel{
 			Title: "bar",
-		}).ID().Hex()
+		}).ID()
 		tester.Insert(&postModel{
 			Title: "baz",
 		})
@@ -2542,15 +2542,15 @@ func TestSorting(t *testing.T) {
 		post2 := tester.Insert(&postModel{
 			Title:    "post-2",
 			TextBody: "body-2",
-		}).ID().Hex()
+		}).ID()
 		post1 := tester.Insert(&postModel{
 			Title:    "post-1",
 			TextBody: "body-1",
-		}).ID().Hex()
+		}).ID()
 		post3 := tester.Insert(&postModel{
 			Title:    "post-3",
 			TextBody: "body-3",
-		}).ID().Hex()
+		}).ID()
 
 		// test invalid sorter
 		tester.Request("GET", "posts?sort=foo", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -2912,18 +2912,18 @@ func TestSorting(t *testing.T) {
 		comment1 := tester.Insert(&commentModel{
 			Message: "Comment 1",
 			Post:    post,
-		}).ID().Hex()
+		}).ID()
 		comment2 := tester.Insert(&commentModel{
 			Message: "Comment 2",
 			Post:    post,
-		}).ID().Hex()
+		}).ID()
 		comment3 := tester.Insert(&commentModel{
 			Message: "Comment 3",
 			Post:    post,
-		}).ID().Hex()
+		}).ID()
 
 		// get first page of comments
-		tester.Request("GET", "posts/"+post.Hex()+"/comments?sort=message", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("GET", "posts/"+post+"/comments?sort=message", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			data := gjson.Get(r.Body.String(), "data").Raw
 			links := gjson.Get(r.Body.String(), "links").Raw
 
@@ -2946,7 +2946,7 @@ func TestSorting(t *testing.T) {
 						"post": {
 							"data": {
 								"type": "posts",
-								"id": "`+post.Hex()+`"
+								"id": "`+post+`"
 							},
 							"links": {
 								"self": "/comments/`+comment1+`/relationships/post",
@@ -2972,7 +2972,7 @@ func TestSorting(t *testing.T) {
 						"post": {
 							"data": {
 								"type": "posts",
-								"id": "`+post.Hex()+`"
+								"id": "`+post+`"
 							},
 							"links": {
 								"self": "/comments/`+comment2+`/relationships/post",
@@ -2998,7 +2998,7 @@ func TestSorting(t *testing.T) {
 						"post": {
 							"data": {
 								"type": "posts",
-								"id": "`+post.Hex()+`"
+								"id": "`+post+`"
 							},
 							"links": {
 								"self": "/comments/`+comment3+`/relationships/post",
@@ -3009,12 +3009,12 @@ func TestSorting(t *testing.T) {
 				}
 			]`, data, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
-				"self": "/posts/`+post.Hex()+`/comments?sort=message"
+				"self": "/posts/`+post+`/comments?sort=message"
 			}`, linkUnescape(links), tester.DebugRequest(rq, r))
 		})
 
 		// get second page of comments
-		tester.Request("GET", "posts/"+post.Hex()+"/comments?sort=-message", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("GET", "posts/"+post+"/comments?sort=-message", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			data := gjson.Get(r.Body.String(), "data").Raw
 			links := gjson.Get(r.Body.String(), "links").Raw
 
@@ -3037,7 +3037,7 @@ func TestSorting(t *testing.T) {
 						"post": {
 							"data": {
 								"type": "posts",
-								"id": "`+post.Hex()+`"
+								"id": "`+post+`"
 							},
 							"links": {
 								"self": "/comments/`+comment3+`/relationships/post",
@@ -3063,7 +3063,7 @@ func TestSorting(t *testing.T) {
 						"post": {
 							"data": {
 								"type": "posts",
-								"id": "`+post.Hex()+`"
+								"id": "`+post+`"
 							},
 							"links": {
 								"self": "/comments/`+comment2+`/relationships/post",
@@ -3089,7 +3089,7 @@ func TestSorting(t *testing.T) {
 						"post": {
 							"data": {
 								"type": "posts",
-								"id": "`+post.Hex()+`"
+								"id": "`+post+`"
 							},
 							"links": {
 								"self": "/comments/`+comment1+`/relationships/post",
@@ -3100,7 +3100,7 @@ func TestSorting(t *testing.T) {
 				}
 			]`, data, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
-				"self": "/posts/`+post.Hex()+`/comments?sort=-message"
+				"self": "/posts/`+post+`/comments?sort=-message"
 			}`, linkUnescape(links), tester.DebugRequest(rq, r))
 		})
 	})
@@ -3134,7 +3134,7 @@ func TestSearching(t *testing.T) {
 		post1 := tester.Insert(&postModel{
 			Title:    "post-2",
 			TextBody: "bar quz",
-		}).ID().Hex()
+		}).ID()
 		tester.Insert(&postModel{
 			Title:    "post-1",
 			TextBody: "bar baz",
@@ -3142,7 +3142,7 @@ func TestSearching(t *testing.T) {
 		post3 := tester.Insert(&postModel{
 			Title:    "post-3",
 			TextBody: "foo bar",
-		}).ID().Hex()
+		}).ID()
 
 		// attempt to search comments
 		tester.Request("GET", "comments?search=foo", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -3249,7 +3249,7 @@ func TestProperties(t *testing.T) {
 		post1 := tester.Insert(&postModel{
 			Title:     "post-1",
 			Published: true,
-		}).ID().Hex()
+		}).ID()
 
 		// list
 		tester.Request("GET", "posts", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -3342,7 +3342,7 @@ func TestProperties(t *testing.T) {
 		// create error post
 		errorPost := tester.Insert(&postModel{
 			Title: "virtual-error",
-		}).ID().Hex()
+		}).ID()
 
 		// error
 		tester.Request("GET", "/posts/"+errorPost, "", func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -3367,7 +3367,7 @@ func TestProperties(t *testing.T) {
 				}
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
-			post2 := tester.FindLast(&postModel{}).ID().Hex()
+			post2 := tester.FindLast(&postModel{}).ID()
 
 			assert.Equal(t, http.StatusCreated, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -3496,11 +3496,11 @@ func TestCallbacks(t *testing.T) {
 
 		id := tester.Insert(&fooModel{
 			String: "Hello World!",
-		}).ID().Hex()
+		}).ID()
 
 		id2 := tester.Insert(&fooModel{
 			String: "Hello Cool!",
-		}).ID().Hex()
+		}).ID()
 
 		// list
 		tester.Request("GET", "foos", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -3720,7 +3720,7 @@ func TestAuthorizers(t *testing.T) {
 		})
 
 		// find
-		tester.Request("GET", "/posts/"+post.Hex(), "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("GET", "/posts/"+post, "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusUnauthorized, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
 				"errors": [{
@@ -3751,10 +3751,10 @@ func TestAuthorizers(t *testing.T) {
 		})
 
 		// update
-		tester.Request("PATCH", "/posts/"+post.Hex(), `{
+		tester.Request("PATCH", "/posts/"+post, `{
 			"data": {
 				"type": "posts",
-				"id": "`+post.Hex()+`",
+				"id": "`+post+`",
 				"attributes": {
 					"title": "Post 1"
 				}
@@ -3771,7 +3771,7 @@ func TestAuthorizers(t *testing.T) {
 		})
 
 		// delete
-		tester.Request("DELETE", "/posts/"+post.Hex(), "{}", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("DELETE", "/posts/"+post, "{}", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusUnauthorized, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
 				"errors": [{
@@ -3814,7 +3814,7 @@ func TestVerifiers(t *testing.T) {
 		})
 
 		// find
-		tester.Request("GET", "/posts/"+post.Hex(), "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("GET", "/posts/"+post, "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusUnauthorized, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
 				"errors": [{
@@ -3845,10 +3845,10 @@ func TestVerifiers(t *testing.T) {
 		})
 
 		// update
-		tester.Request("PATCH", "/posts/"+post.Hex(), `{
+		tester.Request("PATCH", "/posts/"+post, `{
 			"data": {
 				"type": "posts",
-				"id": "`+post.Hex()+`",
+				"id": "`+post+`",
 				"attributes": {
 					"title": "Post 1"
 				}
@@ -3865,7 +3865,7 @@ func TestVerifiers(t *testing.T) {
 		})
 
 		// delete
-		tester.Request("DELETE", "/posts/"+post.Hex(), "{}", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("DELETE", "/posts/"+post, "{}", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusUnauthorized, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
 				"errors": [{
@@ -3904,7 +3904,7 @@ func TestModifiers(t *testing.T) {
 			Title:     "post-1",
 			Published: true,
 			TextBody:  "Hello",
-		}).ID().Hex()
+		}).ID()
 
 		// list
 		tester.Request("GET", "posts", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -4001,7 +4001,7 @@ func TestModifiers(t *testing.T) {
 				}
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
-			post2 := tester.FindLast(&postModel{}).ID().Hex()
+			post2 := tester.FindLast(&postModel{}).ID()
 
 			assert.Equal(t, http.StatusCreated, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -4132,7 +4132,7 @@ func TestValidators(t *testing.T) {
 		})
 
 		// find
-		tester.Request("GET", "/posts/"+post.Hex(), "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("GET", "/posts/"+post, "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusOK, r.Result().StatusCode, tester.DebugRequest(rq, r))
 		})
 
@@ -4156,10 +4156,10 @@ func TestValidators(t *testing.T) {
 		})
 
 		// update
-		tester.Request("PATCH", "/posts/"+post.Hex(), `{
+		tester.Request("PATCH", "/posts/"+post, `{
 			"data": {
 				"type": "posts",
-				"id": "`+post.Hex()+`",
+				"id": "`+post+`",
 				"attributes": {
 					"title": "Post 1"
 				}
@@ -4176,7 +4176,7 @@ func TestValidators(t *testing.T) {
 		})
 
 		// delete
-		tester.Request("DELETE", "/posts/"+post.Hex(), "{}", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("DELETE", "/posts/"+post, "{}", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusBadRequest, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
 				"errors": [{
@@ -4218,7 +4218,7 @@ func TestDecorators(t *testing.T) {
 		post1 := tester.Insert(&postModel{
 			Title:     "post-1",
 			Published: true,
-		}).ID().Hex()
+		}).ID()
 
 		// list
 		tester.Request("GET", "posts", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -4314,7 +4314,7 @@ func TestDecorators(t *testing.T) {
 				}
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
-			post2 := tester.FindLast(&postModel{}).ID().Hex()
+			post2 := tester.FindLast(&postModel{}).ID()
 
 			assert.Equal(t, http.StatusCreated, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -4447,7 +4447,7 @@ func TestNotifiers(t *testing.T) {
 		post1 := tester.Insert(&postModel{
 			Title:     "post-1",
 			Published: true,
-		}).ID().Hex()
+		}).ID()
 
 		// list
 		tester.Request("GET", "posts", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -4549,7 +4549,7 @@ func TestNotifiers(t *testing.T) {
 				}
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
-			post2 := tester.FindLast(&postModel{}).ID().Hex()
+			post2 := tester.FindLast(&postModel{}).ID()
 
 			assert.Equal(t, http.StatusCreated, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -4676,14 +4676,14 @@ func TestSparseFields(t *testing.T) {
 		}).ID()
 
 		// get posts
-		tester.Request("GET", "posts/"+post.Hex()+"?fields[posts]=title,virtual,note", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("GET", "posts/"+post+"?fields[posts]=title,virtual,note", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			data := gjson.Get(r.Body.String(), "data").Raw
 			links := gjson.Get(r.Body.String(), "links").Raw
 
 			assert.Equal(t, http.StatusOK, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
 				"type": "posts",
-				"id": "`+post.Hex()+`",
+				"id": "`+post+`",
 				"attributes": {
 					"title": "Post 1",
 					"virtual": 42
@@ -4692,14 +4692,14 @@ func TestSparseFields(t *testing.T) {
 					"note": {
 						"data": null,
 						"links": {
-							"self": "/posts/`+post.Hex()+`/relationships/note",
-							"related": "/posts/`+post.Hex()+`/note"
+							"self": "/posts/`+post+`/relationships/note",
+							"related": "/posts/`+post+`/note"
 						}
 					}
 				}
 			}`, data, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
-				"self": "/posts/`+post.Hex()+`?fields[posts]=title,virtual,note"
+				"self": "/posts/`+post+`?fields[posts]=title,virtual,note"
 			}`, linkUnescape(links), tester.DebugRequest(rq, r))
 		})
 
@@ -4710,29 +4710,29 @@ func TestSparseFields(t *testing.T) {
 		}).ID()
 
 		// get related note
-		tester.Request("GET", "/posts/"+post.Hex()+"/note?fields[notes]=post", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("GET", "/posts/"+post+"/note?fields[notes]=post", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			data := gjson.Get(r.Body.String(), "data").Raw
 			links := gjson.Get(r.Body.String(), "links").Raw
 
 			assert.Equal(t, http.StatusOK, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
 				"type": "notes",
-				"id": "`+note.Hex()+`",
+				"id": "`+note+`",
 				"relationships": {
 					"post": {
 						"data": {
 							"type": "posts",
-							"id": "`+post.Hex()+`"
+							"id": "`+post+`"
 						},
 						"links": {
-							"self": "/notes/`+note.Hex()+`/relationships/post",
-							"related": "/notes/`+note.Hex()+`/post"
+							"self": "/notes/`+note+`/relationships/post",
+							"related": "/notes/`+note+`/post"
 						}
 					}
 				}
 			}`, data, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
-				"self": "/posts/`+post.Hex()+`/note?fields[notes]=post"
+				"self": "/posts/`+post+`/note?fields[notes]=post"
 			}`, linkUnescape(links), tester.DebugRequest(rq, r))
 		})
 	})
@@ -4778,7 +4778,7 @@ func TestReadableFields(t *testing.T) {
 				"data": [
 					{
 						"type": "posts",
-						"id": "`+post.Hex()+`",
+						"id": "`+post+`",
 						"attributes": {
 							"published": true
 						}
@@ -4791,7 +4791,7 @@ func TestReadableFields(t *testing.T) {
 		})
 
 		// attempt to get relationship
-		tester.Request("GET", "/posts/"+post.Hex()+"/relationships/note", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("GET", "/posts/"+post+"/relationships/note", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusBadRequest, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
 				"errors": [{
@@ -4803,7 +4803,7 @@ func TestReadableFields(t *testing.T) {
 		})
 
 		// attempt to get related note
-		tester.Request("GET", "/posts/"+post.Hex()+"/note", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("GET", "/posts/"+post+"/note", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusBadRequest, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
 				"errors": [{
@@ -4827,7 +4827,7 @@ func TestReadableFields(t *testing.T) {
 		})
 
 		// filter notes
-		tester.Request("GET", "notes?filter[post]="+post.Hex(), "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("GET", "notes?filter[post]="+post, "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusBadRequest, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
 				"errors": [{
@@ -4889,7 +4889,7 @@ func TestReadableFieldsGetter(t *testing.T) {
 				"data": [
 					{
 						"type": "posts",
-						"id": "`+post1.Hex()+`",
+						"id": "`+post1+`",
 						"attributes": {
 							"title": "post1",
 							"published": true
@@ -4897,7 +4897,7 @@ func TestReadableFieldsGetter(t *testing.T) {
 					},
 					{
 						"type": "posts",
-						"id": "`+post2.Hex()+`",
+						"id": "`+post2+`",
 						"attributes": {
 							"title": "post2"
 						}
@@ -4978,7 +4978,7 @@ func TestWritableFields(t *testing.T) {
 			assert.NotEmpty(t, r.Body.String(), tester.DebugRequest(rq, r))
 		})
 
-		post1 := tester.FindLast(&postModel{}).ID().Hex()
+		post1 := tester.FindLast(&postModel{}).ID()
 
 		// attempt to update post with protected field
 		tester.Request("PATCH", "posts/"+post1, `{
@@ -5028,7 +5028,7 @@ func TestWritableFields(t *testing.T) {
 					"posts": {
 						"data": [{
 							"type": "posts",
-							"id": "`+coal.New().Hex()+`"
+							"id": "`+coal.New()+`"
 						}]
 					}
 				}
@@ -5063,7 +5063,7 @@ func TestWritableFields(t *testing.T) {
 			assert.NotEmpty(t, r.Body.String(), tester.DebugRequest(rq, r))
 		})
 
-		selection1 := tester.FindLast(&selectionModel{}).ID().Hex()
+		selection1 := tester.FindLast(&selectionModel{}).ID()
 
 		// attempt to update selection with protected relationship
 		tester.Request("PATCH", "selections/"+selection1, `{
@@ -5074,7 +5074,7 @@ func TestWritableFields(t *testing.T) {
 					"posts": {
 						"data": [{
 							"type": "posts",
-							"id": "`+coal.New().Hex()+`"
+							"id": "`+coal.New()+`"
 						}]
 					}
 				}
@@ -5109,14 +5109,14 @@ func TestWritableFields(t *testing.T) {
 			assert.NotEmpty(t, r.Body.String(), tester.DebugRequest(rq, r))
 		})
 
-		post2 := coal.New().Hex()
+		post2 := coal.New()
 
 		// attempt to update posts relationship
 		tester.Request("PATCH", "selections/"+selection1+"/relationships/posts", `{
 			"data": [
 				{
 					"type": "posts",
-					"id": "`+coal.New().Hex()+`"
+					"id": "`+coal.New()+`"
 				}
 			]
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -5135,7 +5135,7 @@ func TestWritableFields(t *testing.T) {
 			"data": [
 				{
 					"type": "posts",
-					"id": "`+coal.New().Hex()+`"
+					"id": "`+coal.New()+`"
 				}
 			]
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -5200,10 +5200,10 @@ func TestWritableFieldsGetter(t *testing.T) {
 		}).ID()
 
 		// attempt to update post
-		tester.Request("PATCH", "posts/"+post1.Hex(), `{
+		tester.Request("PATCH", "posts/"+post1, `{
 			"data": {
 				"type": "posts",
-				"id": "`+post1.Hex()+`",
+				"id": "`+post1+`",
 				"attributes": {
 					"published": true
 				},
@@ -5224,10 +5224,10 @@ func TestWritableFieldsGetter(t *testing.T) {
 		})
 
 		// create post
-		tester.Request("PATCH", "posts/"+post2.Hex(), `{
+		tester.Request("PATCH", "posts/"+post2, `{
 			"data": {
 				"type": "posts",
-				"id": "`+post2.Hex()+`",
+				"id": "`+post2+`",
 				"attributes": {
 					"published": true
 				},
@@ -5273,7 +5273,7 @@ func TestReadableProperties(t *testing.T) {
 		post := tester.Insert(&postModel{
 			Title:     "post-1",
 			Published: true,
-		}).ID().Hex()
+		}).ID()
 
 		// get posts
 		tester.Request("GET", "posts", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -5349,10 +5349,10 @@ func TestReadablePropertiesGetter(t *testing.T) {
 		// create posts
 		post1 := tester.Insert(&postModel{
 			Title: "post1",
-		}).ID().Hex()
+		}).ID()
 		post2 := tester.Insert(&postModel{
 			Title: "post2",
-		}).ID().Hex()
+		}).ID()
 
 		// get posts
 		tester.Request("GET", "posts", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -5449,17 +5449,17 @@ func TestRelationshipFilters(t *testing.T) {
 		// create post
 		post := tester.Insert(&postModel{
 			Title: "post",
-		}).ID().Hex()
+		}).ID()
 
 		// create comment
-		comment1 := coal.New().Hex()
+		comment1 := coal.New()
 		tester.Insert(&commentModel{
 			Base:    coal.B(coal.MustFromHex(comment1)),
 			Message: "foo",
 			Parent:  stick.P(coal.MustFromHex(comment1)),
 			Post:    coal.MustFromHex(post),
 		})
-		comment2 := coal.New().Hex()
+		comment2 := coal.New()
 		tester.Insert(&commentModel{
 			Base:    coal.B(coal.MustFromHex(comment2)),
 			Message: "bar",
@@ -5479,7 +5479,7 @@ func TestRelationshipFilters(t *testing.T) {
 			Posts: []coal.ID{
 				coal.MustFromHex(post),
 			},
-		}).ID().Hex()
+		}).ID()
 
 		// create notes
 		tester.Insert(&noteModel{
@@ -5489,7 +5489,7 @@ func TestRelationshipFilters(t *testing.T) {
 		note2 := tester.Insert(&noteModel{
 			Title: "bar",
 			Post:  coal.MustFromHex(post),
-		}).ID().Hex()
+		}).ID()
 
 		// get posts
 		tester.Request("GET", "posts", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -5684,7 +5684,7 @@ func TestDatabaseErrors(t *testing.T) {
 		})
 
 		// missing resource
-		tester.Request("GET", "posts/"+coal.New().Hex(), "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("GET", "posts/"+coal.New(), "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusNotFound, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
 				"errors": [
@@ -5782,7 +5782,7 @@ func TestTolerateViolations(t *testing.T) {
 				"relationships": {}
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
-			post := tester.FindLast(&postModel{}).ID().Hex()
+			post := tester.FindLast(&postModel{}).ID()
 
 			assert.Equal(t, http.StatusCreated, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -5833,13 +5833,13 @@ func TestTolerateViolations(t *testing.T) {
 					"posts": {
 						"data": [{
 							"type": "posts",
-							"id": "`+coal.New().Hex()+`"
+							"id": "`+coal.New()+`"
 						}]
 					}
 				}
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
-			selection := tester.FindLast(&selectionModel{}).ID().Hex()
+			selection := tester.FindLast(&selectionModel{}).ID()
 
 			assert.Equal(t, http.StatusCreated, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -5960,7 +5960,7 @@ func TestOffsetPagination(t *testing.T) {
 		// create selection
 		selection := tester.Insert(&selectionModel{
 			Posts: ids,
-		}).ID().Hex()
+		}).ID()
 
 		// get first page of posts
 		tester.Request("GET", "selections/"+selection+"/posts?page[number]=1&page[size]=5", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -6008,7 +6008,7 @@ func TestOffsetPagination(t *testing.T) {
 		}
 
 		// get first page of comments
-		tester.Request("GET", "posts/"+post.Hex()+"/comments?page[number]=1&page[size]=5", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("GET", "posts/"+post+"/comments?page[number]=1&page[size]=5", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			list := gjson.Get(r.Body.String(), "data").Array()
 			links := gjson.Get(r.Body.String(), "links").Raw
 
@@ -6016,15 +6016,15 @@ func TestOffsetPagination(t *testing.T) {
 			assert.Equal(t, 5, len(list), tester.DebugRequest(rq, r))
 			assert.Equal(t, "Comment 1", list[0].Get("attributes.message").String(), tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
-				"self": "/posts/`+post.Hex()+`/comments?page[number]=1&page[size]=5",
-				"first": "/posts/`+post.Hex()+`/comments?page[number]=1&page[size]=5",
-				"last": "/posts/`+post.Hex()+`/comments?page[number]=2&page[size]=5",
-				"next": "/posts/`+post.Hex()+`/comments?page[number]=2&page[size]=5"
+				"self": "/posts/`+post+`/comments?page[number]=1&page[size]=5",
+				"first": "/posts/`+post+`/comments?page[number]=1&page[size]=5",
+				"last": "/posts/`+post+`/comments?page[number]=2&page[size]=5",
+				"next": "/posts/`+post+`/comments?page[number]=2&page[size]=5"
 			}`, linkUnescape(links))
 		})
 
 		// get second page of comments
-		tester.Request("GET", "posts/"+post.Hex()+"/comments?page[number]=2&page[size]=5", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("GET", "posts/"+post+"/comments?page[number]=2&page[size]=5", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			list := gjson.Get(r.Body.String(), "data").Array()
 			links := gjson.Get(r.Body.String(), "links").Raw
 
@@ -6032,10 +6032,10 @@ func TestOffsetPagination(t *testing.T) {
 			assert.Equal(t, 5, len(list), tester.DebugRequest(rq, r))
 			assert.Equal(t, "Comment 6", list[0].Get("attributes.message").String(), tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
-				"self": "/posts/`+post.Hex()+`/comments?page[number]=2&page[size]=5",
-				"first": "/posts/`+post.Hex()+`/comments?page[number]=1&page[size]=5",
-				"last": "/posts/`+post.Hex()+`/comments?page[number]=2&page[size]=5",
-				"prev": "/posts/`+post.Hex()+`/comments?page[number]=1&page[size]=5"
+				"self": "/posts/`+post+`/comments?page[number]=2&page[size]=5",
+				"first": "/posts/`+post+`/comments?page[number]=1&page[size]=5",
+				"last": "/posts/`+post+`/comments?page[number]=2&page[size]=5",
+				"prev": "/posts/`+post+`/comments?page[number]=1&page[size]=5"
 			}`, linkUnescape(links))
 		})
 	})
@@ -6459,7 +6459,7 @@ func TestCollectionActions(t *testing.T) {
 			})
 		})
 
-		id := coal.New().Hex()
+		id := coal.New()
 		assert.PanicsWithValue(t, `fire: invalid collection action "`+id+`"`, func() {
 			tester.Assign("api", &Controller{
 				Model: &postModel{},
@@ -6623,7 +6623,7 @@ func TestResourceActions(t *testing.T) {
 		// get byte response
 		tester.Header["Content-Type"] = "text/plain"
 		tester.Header["Accept"] = "text/plain"
-		tester.Request("POST", "posts/"+post.Hex()+"/bytes", "PAYLOAD", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("POST", "posts/"+post+"/bytes", "PAYLOAD", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusOK, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.Equal(t, "text/plain; charset=utf-8", r.Result().Header.Get("Content-Type"), tester.DebugRequest(rq, r))
 			assert.Equal(t, "RESPONSE", r.Body.String(), tester.DebugRequest(rq, r))
@@ -6632,14 +6632,14 @@ func TestResourceActions(t *testing.T) {
 		// get empty response
 		tester.Header["Content-Type"] = ""
 		tester.Header["Accept"] = ""
-		tester.Request("POST", "posts/"+post.Hex()+"/empty", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("POST", "posts/"+post+"/empty", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusOK, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.Empty(t, r.Result().Header.Get("Content-Type"), tester.DebugRequest(rq, r))
 			assert.Empty(t, r.Body.String(), tester.DebugRequest(rq, r))
 		})
 
 		// get error
-		tester.Request("POST", "posts/"+post.Hex()+"/error", "PAYLOAD", func(r *httptest.ResponseRecorder, rq *http.Request) {
+		tester.Request("POST", "posts/"+post+"/error", "PAYLOAD", func(r *httptest.ResponseRecorder, rq *http.Request) {
 			assert.Equal(t, http.StatusRequestEntityTooLarge, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.Empty(t, r.Result().Header.Get("Content-Type"), tester.DebugRequest(rq, r))
 			assert.Empty(t, r.Body.String(), tester.DebugRequest(rq, r))
@@ -6689,7 +6689,7 @@ func TestSoftDelete(t *testing.T) {
 
 		id := tester.Insert(&postModel{
 			Title: "Post 1",
-		}).ID().Hex()
+		}).ID()
 
 		// get list of posts
 		tester.Request("GET", "posts", "", func(r *httptest.ResponseRecorder, rq *http.Request) {
@@ -6891,7 +6891,7 @@ func TestIdempotentCreate(t *testing.T) {
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
 			selection := tester.FindLast(&selectionModel{})
-			id = selection.ID().Hex()
+			id = selection.ID()
 
 			assert.Equal(t, http.StatusCreated, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -7017,7 +7017,7 @@ func TestConsistentUpdate(t *testing.T) {
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
 			selection = tester.FindLast(&selectionModel{}).(*selectionModel)
-			id = selection.ID().Hex()
+			id = selection.ID()
 
 			assert.Equal(t, http.StatusCreated, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -7162,7 +7162,7 @@ func TestTransactions(t *testing.T) {
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
 			post := tester.FindLast(&postModel{})
-			id = post.ID().Hex()
+			id = post.ID()
 
 			assert.Equal(t, http.StatusCreated, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{
@@ -7214,7 +7214,7 @@ func TestTransactions(t *testing.T) {
 			}
 		}`, func(r *httptest.ResponseRecorder, rq *http.Request) {
 			post := tester.FindLast(&postModel{})
-			id = post.ID().Hex()
+			id = post.ID()
 
 			assert.Equal(t, http.StatusInternalServerError, r.Result().StatusCode, tester.DebugRequest(rq, r))
 			assert.JSONEq(t, `{

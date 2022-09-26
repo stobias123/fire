@@ -13,8 +13,8 @@ var metaMutex sync.Mutex
 var metaCache = map[reflect.Type]*Meta{}
 
 var baseType = reflect.TypeOf(Base{})
-var toOneType = reflect.TypeOf(ID{})
-var optToOneType = reflect.TypeOf(&ID{})
+var toOneType = reflect.TypeOf("")
+var optToOneType = reflect.TypeOf(*new(string))
 var toManyType = reflect.TypeOf([]ID{})
 var hasOneType = reflect.TypeOf(HasOne{})
 var hasManyType = reflect.TypeOf(HasMany{})

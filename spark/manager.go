@@ -282,7 +282,7 @@ func (m *manager) handle(ctx *fire.Context) error {
 			// create response
 			res := response{
 				evt.Stream.Name(): {
-					evt.ID.Hex(): string(evt.Type),
+					evt.ID: string(evt.Type),
 				},
 			}
 

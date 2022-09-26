@@ -88,7 +88,7 @@ func (m *Manager) T() *Translator {
 func (m *Manager) Find(ctx context.Context, model Model, id ID, lock bool, flags ...Flags) (bool, error) {
 	// trace
 	ctx, span := xo.Trace(ctx, "coal/Manager.Find")
-	span.Tag("id", id.Hex())
+	span.Tag("id", id)
 	defer span.End()
 
 	// check lock
@@ -746,7 +746,7 @@ func (m *Manager) insert(ctx context.Context, models []Model, flags ...Flags) er
 		}
 
 		// ensure id
-		if model.ID().IsZero() {
+		if model.ID() == "" {
 			model.GetBase().DocID = New()
 		}
 	}
@@ -816,7 +816,7 @@ func (m *Manager) InsertIfMissing(ctx context.Context, filter bson.M, model Mode
 	}
 
 	// ensure id
-	if model.ID().IsZero() {
+	if model.ID() == "" {
 		model.GetBase().DocID = New()
 	}
 
@@ -869,7 +869,7 @@ func (m *Manager) Replace(ctx context.Context, model Model, lock bool, flags ...
 	}
 
 	// check id
-	if model.ID().IsZero() {
+	if model.ID() == "" {
 		return false, xo.F("model has a zero id")
 	}
 

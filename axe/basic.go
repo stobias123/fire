@@ -25,7 +25,7 @@ func Enqueue(ctx context.Context, store *coal.Store, job Job, delay, isolation t
 	base := job.GetBase()
 
 	// ensure id
-	if base.DocID.IsZero() {
+	if base.DocID == "" {
 		base.DocID = coal.New()
 	}
 
@@ -33,7 +33,7 @@ func Enqueue(ctx context.Context, store *coal.Store, job Job, delay, isolation t
 	ctx, span := xo.Trace(ctx, "axe/Enqueue")
 	span.Tag("name", meta.Name)
 	span.Tag("label", base.Label)
-	span.Tag("id", job.ID().Hex())
+	span.Tag("id", job.ID())
 	span.Tag("delay", delay.String())
 	span.Tag("isolation", isolation.String())
 	defer span.End()
@@ -142,7 +142,7 @@ func Dequeue(ctx context.Context, store *coal.Store, job Job, timeout time.Durat
 	// trace
 	ctx, span := xo.Trace(ctx, "axe/Dequeue")
 	span.Tag("name", meta.Name)
-	span.Tag("id", job.ID().Hex())
+	span.Tag("id", job.ID())
 	span.Tag("timeout", timeout.String())
 	defer span.End()
 
@@ -217,7 +217,7 @@ func Update(ctx context.Context, store *coal.Store, job Job, status string, prog
 	ctx, span := xo.Trace(ctx, "axe/Update")
 	span.Tag("name", meta.Name)
 	span.Tag("label", base.Label)
-	span.Tag("id", job.ID().Hex())
+	span.Tag("id", job.ID())
 	defer span.End()
 
 	// validate job
@@ -264,7 +264,7 @@ func Complete(ctx context.Context, store *coal.Store, job Job) error {
 	ctx, span := xo.Trace(ctx, "axe/Complete")
 	span.Tag("name", meta.Name)
 	span.Tag("label", base.Label)
-	span.Tag("id", job.ID().Hex())
+	span.Tag("id", job.ID())
 	defer span.End()
 
 	// validate job
@@ -323,7 +323,7 @@ func Fail(ctx context.Context, store *coal.Store, job Job, reason string, delay 
 	ctx, span := xo.Trace(ctx, "axe/Fail")
 	span.Tag("name", meta.Name)
 	span.Tag("label", base.Label)
-	span.Tag("id", job.ID().Hex())
+	span.Tag("id", job.ID())
 	span.Tag("reason", reason)
 	span.Tag("delay", delay.String())
 	defer span.End()
@@ -369,7 +369,7 @@ func Cancel(ctx context.Context, store *coal.Store, job Job, reason string) erro
 	ctx, span := xo.Trace(ctx, "axe/Cancel")
 	span.Tag("name", meta.Name)
 	span.Tag("label", base.Label)
-	span.Tag("id", job.ID().Hex())
+	span.Tag("id", job.ID())
 	span.Tag("reason", reason)
 	defer span.End()
 

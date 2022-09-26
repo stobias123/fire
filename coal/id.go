@@ -8,16 +8,16 @@ import (
 )
 
 // ID is shorthand type for the object id.
-type ID = primitive.ObjectID
+type ID = string
 
 // New will return a new object id, optionally using a custom timestamp.
 func New(timestamp ...time.Time) ID {
 	// check timestamp
 	if len(timestamp) > 0 {
-		return primitive.NewObjectIDFromTimestamp(timestamp[0])
+		return primitive.NewObjectIDFromTimestamp(timestamp[0]).Hex()
 	}
 
-	return primitive.NewObjectID()
+	return primitive.NewObjectID().Hex()
 }
 
 // IsHex will assess whether the provided string is a valid hex encoded
@@ -30,16 +30,12 @@ func IsHex(str string) bool {
 // FromHex will convert the provided string to an object id.
 func FromHex(str string) (ID, error) {
 	id, err := primitive.ObjectIDFromHex(str)
-	return id, xo.W(err)
+	return id.Hex(), xo.W(err)
 }
 
-// MustFromHex will convert the provided string to an object id and panic if
-// the string is not a valid object id.
-func MustFromHex(str string) ID {
-	id, err := FromHex(str)
-	if err != nil {
-		panic(err)
-	}
-
-	return id
+// MustFromHex is a vestage of when id was the ObjectID type.
+// It remains for compat reasons.
+// I'm not using it.
+func MustFromHex(str string) string {
+	return str
 }

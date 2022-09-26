@@ -47,7 +47,7 @@ func TestNotaryIssueDefaults(t *testing.T) {
 	var key testKey
 	err = notary.Verify(nil, &key, token)
 	assert.NoError(t, err)
-	assert.False(t, key.ID.IsZero())
+	assert.False(t, key.ID == "")
 	assert.True(t, time.Until(key.Expires) > time.Hour-time.Minute)
 	assert.Equal(t, "user", key.User)
 	assert.Equal(t, "role", key.Role)
@@ -82,7 +82,7 @@ func TestNotaryVerifyErrors(t *testing.T) {
 	err = notary.Verify(nil, &key, makeToken(jwtClaims{
 		Issuer:   "test",
 		Audience: "test",
-		ID:       coal.New().Hex(),
+		ID:       coal.New(),
 		Issued:   time.Now().Unix(),
 		Expires:  time.Now().Add(time.Hour).Unix(),
 		Data:     nil,

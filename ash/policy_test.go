@@ -233,7 +233,7 @@ func TestPolicy(t *testing.T) {
 
 	magicID = example2.ID()
 	tester.DeleteError(t, example2, roast.AccessDenied)
-	magicID = coal.ID{}
+	magicID = ""
 	tester.Delete(t, example2, nil)
 
 	code, _ := tester.Call(t, tester.URL("examples", "c1"), nil, nil)
@@ -242,9 +242,9 @@ func TestPolicy(t *testing.T) {
 	code, _ = tester.Call(t, tester.URL("examples", "c2"), nil, nil)
 	assert.Equal(t, http.StatusUnauthorized, code)
 
-	code, _ = tester.Call(t, tester.URL("examples", example1.ID().Hex(), "r1"), nil, nil)
+	code, _ = tester.Call(t, tester.URL("examples", example1.ID(), "r1"), nil, nil)
 	assert.Equal(t, http.StatusOK, code)
 
-	code, _ = tester.Call(t, tester.URL("examples", example1.ID().Hex(), "r2"), nil, nil)
+	code, _ = tester.Call(t, tester.URL("examples", example1.ID(), "r2"), nil, nil)
 	assert.Equal(t, http.StatusUnauthorized, code)
 }

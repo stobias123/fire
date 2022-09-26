@@ -33,7 +33,7 @@ func ConvertModel(model coal.Model) (*jsonapi.Resource, error) {
 						Data: &jsonapi.HybridResource{
 							One: &jsonapi.Resource{
 								Type: rel.RelType,
-								ID:   id.Hex(),
+								ID:   *id,
 							},
 						},
 					}
@@ -45,7 +45,7 @@ func ConvertModel(model coal.Model) (*jsonapi.Resource, error) {
 					Data: &jsonapi.HybridResource{
 						One: &jsonapi.Resource{
 							Type: rel.RelType,
-							ID:   val.(coal.ID).Hex(),
+							ID:   val.(coal.ID),
 						},
 					},
 				}
@@ -59,7 +59,7 @@ func ConvertModel(model coal.Model) (*jsonapi.Resource, error) {
 			for _, id := range ids {
 				many = append(many, &jsonapi.Resource{
 					Type: rel.RelType,
-					ID:   id.Hex(),
+					ID:   id,
 				})
 			}
 			relationships[rel.RelName] = &jsonapi.Document{
@@ -73,7 +73,7 @@ func ConvertModel(model coal.Model) (*jsonapi.Resource, error) {
 	// prepare resource
 	res := &jsonapi.Resource{
 		Type:          meta.PluralName,
-		ID:            model.ID().Hex(),
+		ID:            model.ID(),
 		Attributes:    attributes,
 		Relationships: relationships,
 	}
